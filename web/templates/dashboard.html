@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yazaki Editz — Boshqaruv Paneli (Localhost)</title>
+  <!-- Tailwind CSS & FontAwesome CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #0d1117;
+      color: #c9d1d9;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .glass-card {
+      background: rgba(22, 27, 34, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(48, 54, 61, 0.8);
+      border-radius: 1rem;
+    }
+    .glass-input {
+      background: #161b22;
+      border: 1px solid #30363d;
+      color: #f0f6fc;
+      border-radius: 0.5rem;
+      padding: 0.6rem 0.9rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .glass-input:focus {
+      border-color: #58a6ff;
+      box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.2);
+    }
+    .pulse-dot {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.1); }
+    }
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0d1117;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #30363d;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #58a6ff;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+  <!-- Asosiy Container -->
+  <div class="max-w-7xl mx-auto space-y-8">
+    
+    <!-- Yuqori Header -->
+    <header class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 glass-card p-6 border-b border-gray-800">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-blue-500 flex items-center justify-center text-white text-2xl shadow-lg shadow-purple-500/20">
+          <i class="fa-solid fa-clapperboard"></i>
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold text-white tracking-wide flex items-center gap-3">
+            Yazaki Editz
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono">v1.0 Localhost</span>
+          </h1>
+          <p class="text-sm text-gray-400">Telegram Bot & Shablonlar Boshqaruv Serveri</p>
+        </div>
+      </div>
+
+      <!-- Tezkor tugmalar va server status -->
+      <div class="flex items-center gap-3 self-stretch md:self-auto">
+        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-800/80 border border-gray-700 text-xs font-mono text-gray-300">
+          <i class="fa-solid fa-network-wired text-emerald-400"></i> http://localhost:5000
+        </span>
+        <button onclick="restartBot()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-semibold flex items-center gap-2 transition duration-150 shadow-md shadow-blue-600/20">
+          <i class="fa-solid fa-rotate"></i> Qayta Ishga Tushirish
+        </button>
+      </div>
+    </header>
+
+    <!-- 4 ta Asosiy Ko'rsatkich Kartalari (Stats Cards) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <!-- Bot Holati -->
+      <div class="glass-card p-5 relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Bot Holati</span>
+          <span id="bot-status-dot" class="w-3 h-3 rounded-full bg-gray-500 pulse-dot"></span>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <span id="bot-status-text" class="text-xl font-bold text-white">Yuklanmoqda...</span>
+        </div>
+        <p id="bot-username" class="text-xs text-gray-400 mt-1 font-mono">@---</p>
+      </div>
+
+      <!-- Majburiy Kanal -->
+      <div class="glass-card p-5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Majburiy Kanal</span>
+          <i class="fa-brands fa-telegram text-blue-400 text-lg"></i>
+        </div>
+        <div class="mt-3">
+          <span id="channel-name-stat" class="text-lg font-bold text-white truncate block">---</span>
+          <a id="channel-url-link" href="#" target="_blank" class="text-xs text-blue-400 hover:underline mt-1 inline-block truncate max-w-full">
+            <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>Kanalga o'tish
+          </a>
+        </div>
+      </div>
+
+      <!-- Shablonlar Soni -->
+      <div class="glass-card p-5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Jami Shablonlar</span>
+          <i class="fa-solid fa-layer-group text-purple-400 text-lg"></i>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <span id="templates-count" class="text-2xl font-bold text-white">0</span>
+          <span class="text-xs text-gray-400">ta preset</span>
+        </div>
+        <p class="text-xs text-emerald-400 mt-1"><i class="fa-solid fa-check mr-1"></i>Yuklab olishga tayyor</p>
+      </div>
+
+      <!-- Server Vaqti -->
+      <div class="glass-card p-5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Localhost Server</span>
+          <i class="fa-solid fa-bolt text-amber-400 text-lg"></i>
+        </div>
+        <div class="mt-3">
+          <span id="server-uptime" class="text-lg font-bold text-white font-mono">Faol</span>
+          <p class="text-xs text-gray-400 mt-1">Python 3.14 + aiogram 3</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Asosiy 2 ustunli bo'lim: Sozlamalar va Shablonlar -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Chap Ustun: Sozlamalar va Bot Boshqaruvi (5 ustun) -->
+      <div class="lg:col-span-5 space-y-6">
+        
+        <!-- Sozlamalar Kartasi -->
+        <div class="glass-card p-6">
+          <div class="flex items-center justify-between mb-5 border-b border-gray-800 pb-3">
+            <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-blue-400"></i> Bot Sozlamalari (.env)
+            </h2>
+            <span class="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded">Real-vaqt</span>
+          </div>
+
+          <form id="settings-form" onsubmit="saveSettings(event)" class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-gray-300 mb-1">
+                Bot Token (@BotFather) <span class="text-red-400">*</span>
+              </label>
+              <div class="relative">
+                <input type="password" id="bot_token" name="bot_token" class="glass-input w-full pr-10 text-sm font-mono" placeholder="123456789:ABCdefGHI..." required>
+                <button type="button" onclick="toggleTokenVisibility()" class="absolute right-3 top-2.5 text-gray-400 hover:text-white">
+                  <i id="token-eye-icon" class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <p class="text-[11px] text-gray-500 mt-1">Telegram @BotFather bergan API token.</p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-gray-300 mb-1">
+                Majburiy Kanal Username yoki ID <span class="text-red-400">*</span>
+              </label>
+              <input type="text" id="channel_id" name="channel_id" class="glass-input w-full text-sm font-mono" placeholder="@yazaki_editz yoki -100xxxxxxxxxx" required>
+              <p class="text-[11px] text-amber-400/90 mt-1">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i>Bot kanalda <b>Administrator</b> bo'lishi shart!
+              </p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-gray-300 mb-1">Kanal Havolasi (URL)</label>
+              <input type="url" id="channel_url" name="channel_url" class="glass-input w-full text-sm" placeholder="https://t.me/yazaki_editz" required>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-gray-300 mb-1">Kanal Nomi (Ko'rinadigan)</label>
+              <input type="text" id="channel_name" name="channel_name" class="glass-input w-full text-sm" placeholder="Yazaki Editz Official">
+            </div>
+
+            <div class="pt-2">
+              <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-semibold flex items-center justify-center gap-2 transition duration-150 shadow-lg shadow-emerald-600/20">
+                <i class="fa-solid fa-floppy-disk"></i> Saqlash va Botni Yangilash
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Tezkor Harakatlar & Havolalar -->
+        <div class="glass-card p-6">
+          <h2 class="text-base font-semibold text-white mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-link text-purple-400"></i> Foydali Havolalar
+          </h2>
+          <div class="space-y-2">
+            <a id="btn-open-bot" href="#" target="_blank" class="w-full p-3 rounded-lg bg-gray-800/60 hover:bg-gray-800 border border-gray-700/60 flex items-center justify-between text-sm transition">
+              <span class="flex items-center gap-3">
+                <i class="fa-brands fa-telegram text-blue-400 text-lg"></i>
+                <span class="font-medium text-gray-200">Telegram Botda Test Qilish</span>
+              </span>
+              <i class="fa-solid fa-arrow-right text-gray-500"></i>
+            </a>
+            <a href="https://t.me/BotFather" target="_blank" class="w-full p-3 rounded-lg bg-gray-800/60 hover:bg-gray-800 border border-gray-700/60 flex items-center justify-between text-sm transition">
+              <span class="flex items-center gap-3">
+                <i class="fa-solid fa-robot text-purple-400 text-lg"></i>
+                <span class="font-medium text-gray-200">@BotFather (Token olish)</span>
+              </span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-gray-500"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- O'ng Ustun: Shablonlar Ro'yxati & Yangi Shablon Qo'shish (7 ustun) -->
+      <div class="lg:col-span-7 space-y-6">
+
+        <!-- Shablonlar Ro'yxati Kartasi -->
+        <div class="glass-card p-6">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5 border-b border-gray-800 pb-3">
+            <div>
+              <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+                <i class="fa-solid fa-film text-pink-400"></i> Mavjud Edit Shablonlari
+              </h2>
+              <p class="text-xs text-gray-400">Bot foydalanuvchilariga ko'rsatiladigan va yuboriladigan fayllar</p>
+            </div>
+            <button onclick="toggleAddTemplateModal(true)" class="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition shadow-md shadow-purple-600/20">
+              <i class="fa-solid fa-plus"></i> Yangi Shablon Qo'shish
+            </button>
+          </div>
+
+          <!-- Shablonlar List Container -->
+          <div id="templates-list" class="space-y-3">
+            <div class="text-center py-8 text-gray-500">
+              <i class="fa-solid fa-spinner fa-spin text-xl mb-2"></i>
+              <p class="text-sm">Shablonlar yuklanmoqda...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-Time Loglar Konsoli -->
+        <div class="glass-card p-6">
+          <div class="flex items-center justify-between mb-3 border-b border-gray-800 pb-2">
+            <h2 class="text-base font-semibold text-white flex items-center gap-2">
+              <i class="fa-solid fa-terminal text-emerald-400"></i> Jonli Tizim Loglari
+            </h2>
+            <div class="flex items-center gap-2">
+              <button onclick="fetchStatus()" class="text-xs text-gray-400 hover:text-white px-2 py-1 rounded bg-gray-800">
+                <i class="fa-solid fa-arrows-rotate mr-1"></i>Yangilash
+              </button>
+              <button onclick="clearLogsUI()" class="text-xs text-gray-400 hover:text-white px-2 py-1 rounded bg-gray-800">
+                Tozalash
+              </button>
+            </div>
+          </div>
+          <div id="console-logs" class="bg-black/80 rounded-lg p-3 font-mono text-xs text-emerald-400/90 h-52 overflow-y-auto space-y-1 border border-gray-800 shadow-inner">
+            <p class="text-gray-500">[Tizim] Loglar kutilyapti...</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Yangi Shablon Qo'shish Modali -->
+  <div id="add-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full p-6 space-y-5 border border-gray-700 shadow-2xl relative">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+          <i class="fa-solid fa-circle-plus text-purple-400"></i> Yangi Shablon Qo'shish
+        </h3>
+        <button onclick="toggleAddTemplateModal(false)" class="text-gray-400 hover:text-white text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <form id="new-template-form" onsubmit="submitNewTemplate(event)" class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-gray-300 mb-1">Shablon ID (inglizcha)</label>
+            <input type="text" id="new_tmpl_id" class="glass-input w-full text-sm font-mono" placeholder="masalan: velocity_shake" required>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-300 mb-1">Toifasi (Category)</label>
+            <select id="new_tmpl_category" class="glass-input w-full text-sm">
+              <option value="Alight Motion">Alight Motion</option>
+              <option value="CapCut">CapCut</option>
+              <option value="Color Grading">Color Grading (LUT)</option>
+              <option value="Sound FX">Sound FX</option>
+              <option value="Boshqa">Boshqa</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-300 mb-1">Tugma Nomi (Telegramda ko'rinadigan)</label>
+          <input type="text" id="new_tmpl_name" class="glass-input w-full text-sm" placeholder="⚡ Ultra Smooth Velocity" required>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-300 mb-1">Tavsif va Yo'riqnoma</label>
+          <textarea id="new_tmpl_desc" rows="3" class="glass-input w-full text-sm" placeholder="Shablon haqida ma'lumot va qanday ishlatish yo'riqnomasi..." required></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-300 mb-1">Tashqi Havola (CapCut link yoki Web havola - ixtiyoriy)</label>
+          <input type="url" id="new_tmpl_link" class="glass-input w-full text-sm" placeholder="https://...">
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-gray-300 mb-1">Fayl Yuklash (.xml, .cube, .zip, .txt)</label>
+          <input type="file" id="new_tmpl_file" class="glass-input w-full text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:bg-purple-600 file:text-white hover:file:bg-purple-500">
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-gray-800">
+          <button type="button" onclick="toggleAddTemplateModal(false)" class="px-4 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-800">
+            Bekor qilish
+          </button>
+          <button type="submit" class="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-semibold shadow-md shadow-purple-600/20">
+            Shablonni Saqlash
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript Kodlari -->
+  <script>
+    // Status va ma'lumotlarni serverdan olish
+    async function fetchStatus() {
+      try {
+        const response = await fetch('/api/status');
+        const data = await response.json();
+
+        // Bot holati
+        const statusDot = document.getElementById('bot-status-dot');
+        const statusText = document.getElementById('bot-status-text');
+        const botUsername = document.getElementById('bot-username');
+        const openBotBtn = document.getElementById('btn-open-bot');
+
+        if (data.status === 'running') {
+          statusDot.className = 'w-3 h-3 rounded-full bg-emerald-500 pulse-dot';
+          statusText.innerText = 'Faol (Online)';
+          statusText.className = 'text-xl font-bold text-emerald-400';
+          botUsername.innerText = '@' + (data.bot_username || 'noma\'lum');
+          openBotBtn.href = 'https://t.me/' + data.bot_username;
+        } else if (data.status === 'unconfigured') {
+          statusDot.className = 'w-3 h-3 rounded-full bg-amber-500 pulse-dot';
+          statusText.innerText = 'Token Kiritilmagan';
+          statusText.className = 'text-xl font-bold text-amber-400';
+          botUsername.innerText = '.env faylini to\'ldiring';
+        } else if (data.status === 'error') {
+          statusDot.className = 'w-3 h-3 rounded-full bg-red-500 pulse-dot';
+          statusText.innerText = 'Xatolik!';
+          statusText.className = 'text-xl font-bold text-red-400';
+          botUsername.innerText = data.error_message || 'Xatolik';
+        } else {
+          statusDot.className = 'w-3 h-3 rounded-full bg-gray-500';
+          statusText.innerText = 'To\'xtatilgan';
+          statusText.className = 'text-xl font-bold text-gray-400';
+        }
+
+        // Kanal ma'lumotlari
+        document.getElementById('channel-name-stat').innerText = data.channel_name || data.channel_id;
+        document.getElementById('channel-url-link').href = data.channel_url || '#';
+
+        // Shablonlar soni
+        document.getElementById('templates-count').innerText = data.templates_count || 0;
+
+        // Sozlamalarni to'ldirish (faqat birinchi marta yoki kiritilmagan bo'lsa)
+        if (!document.getElementById('bot_token').dataset.loaded) {
+          document.getElementById('bot_token').value = data.bot_token || '';
+          document.getElementById('channel_id').value = data.channel_id || '';
+          document.getElementById('channel_url').value = data.channel_url || '';
+          document.getElementById('channel_name').value = data.channel_name || '';
+          document.getElementById('bot_token').dataset.loaded = "true";
+        }
+
+        // Shablonlar ro'yxatini chiqarish
+        renderTemplates(data.templates || {});
+
+        // Loglarni yangilash
+        renderLogs(data.logs || []);
+
+      } catch (err) {
+        console.error('Status olishda xatolik:', err);
+      }
+    }
+
+    // Shablonlar ro'yxatini HTML ga joylash
+    function renderTemplates(templates) {
+      const container = document.getElementById('templates-list');
+      const keys = Object.keys(templates);
+
+      if (keys.length === 0) {
+        container.innerHTML = '<div class="text-center py-6 text-gray-500 text-sm">Hozircha hech qanday shablon mavjud emas.</div>';
+        return;
+      }
+
+      let html = '';
+      for (const key of keys) {
+        const item = templates[key];
+        const filesCount = (item.files || []).length;
+        const linksCount = (item.links || []).length;
+
+        html += `
+          <div class="p-4 rounded-xl bg-gray-800/40 hover:bg-gray-800/80 border border-gray-700/50 transition duration-150 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-white">${item.name}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-300 border border-purple-500/20 font-medium">
+                  ${item.category || 'Preset'}
+                </span>
+              </div>
+              <p class="text-xs text-gray-400 line-clamp-1">${item.description.replace(/[*#_]/g, '')}</p>
+              <div class="flex items-center gap-3 text-[11px] text-gray-400">
+                <span><i class="fa-regular fa-file text-blue-400 mr-1"></i>${filesCount} ta fayl</span>
+                ${linksCount > 0 ? `<span><i class="fa-solid fa-link text-emerald-400 mr-1"></i>${linksCount} ta havola</span>` : ''}
+              </div>
+            </div>
+            <div class="flex items-center gap-2 self-end sm:self-center">
+              ${filesCount > 0 ? `
+                <a href="/download/${item.files[0]}" class="px-2.5 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs rounded-lg transition border border-blue-500/20" title="Faylni yuklab olish">
+                  <i class="fa-solid fa-download"></i>
+                </a>
+              ` : ''}
+              <button onclick="deleteTemplate('${key}')" class="px-2.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs rounded-lg transition border border-red-500/20" title="O'chirish">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    // Konsol loglarini chiqarish
+    function renderLogs(logs) {
+      const logsBox = document.getElementById('console-logs');
+      if (!logs || logs.length === 0) return;
+      logsBox.innerHTML = logs.map(line => `<div class="leading-relaxed hover:bg-white/5 px-1 rounded">${escapeHtml(line)}</div>`).join('');
+      logsBox.scrollTop = logsBox.scrollHeight;
+    }
+
+    function clearLogsUI() {
+      document.getElementById('console-logs').innerHTML = '<p class="text-gray-500">[Tozalandi]</p>';
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.innerText = text;
+      return div.innerHTML;
+    }
+
+    // Token ko'rinishini almashtirish
+    function toggleTokenVisibility() {
+      const tokenInput = document.getElementById('bot_token');
+      const icon = document.getElementById('token-eye-icon');
+      if (tokenInput.type === 'password') {
+        tokenInput.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        tokenInput.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    }
+
+    // Sozlamalarni saqlash
+    async function saveSettings(event) {
+      event.preventDefault();
+      const form = document.getElementById('settings-form');
+      const payload = {
+        bot_token: form.bot_token.value.trim(),
+        channel_id: form.channel_id.value.trim(),
+        channel_url: form.channel_url.value.trim(),
+        channel_name: form.channel_name.value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/settings', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (result.success) {
+          alert('✅ Sozlamalar muvaffaqiyatli saqlandi! Bot yangilanmoqda...');
+          fetchStatus();
+        } else {
+          alert('❌ Xatolik: ' + result.error);
+        }
+      } catch (err) {
+        alert('❌ Server bilan aloqada xatolik: ' + err);
+      }
+    }
+
+    // Botni qayta yuklash
+    async function restartBot() {
+      if (!confirm('Botni qayta ishga tushirishni tasdiqlaysizmi?')) return;
+      try {
+        const res = await fetch('/api/restart', {method: 'POST'});
+        const result = await res.json();
+        alert(result.message || 'Bot qayta ishga tushirildi!');
+        fetchStatus();
+      } catch (err) {
+        alert('Xatolik yuz berdi: ' + err);
+      }
+    }
+
+    // Shablonni o'chirish
+    async function deleteTemplate(tmplId) {
+      if (!confirm('Haqiqatdan ham ushbu shablonni o\'chirmoqchimisiz?')) return;
+      try {
+        const res = await fetch('/api/templates/' + tmplId, {method: 'DELETE'});
+        const result = await res.json();
+        if (result.success) {
+          fetchStatus();
+        } else {
+          alert('O\'chirishda xatolik: ' + result.error);
+        }
+      } catch (err) {
+        alert('Server xatosi: ' + err);
+      }
+    }
+
+    // Modalni ochish/yopish
+    function toggleAddTemplateModal(show) {
+      const modal = document.getElementById('add-modal');
+      if (show) modal.classList.remove('hidden');
+      else modal.classList.add('hidden');
+    }
+
+    // Yangi shablon yuborish
+    async function submitNewTemplate(event) {
+      event.preventDefault();
+      const formData = new FormData();
+      formData.append('id', document.getElementById('new_tmpl_id').value.trim());
+      formData.append('name', document.getElementById('new_tmpl_name').value.trim());
+      formData.append('category', document.getElementById('new_tmpl_category').value);
+      formData.append('description', document.getElementById('new_tmpl_desc').value.trim());
+      formData.append('link', document.getElementById('new_tmpl_link').value.trim());
+
+      const fileInput = document.getElementById('new_tmpl_file');
+      if (fileInput.files.length > 0) {
+        formData.append('file', fileInput.files[0]);
+      }
+
+      try {
+        const res = await fetch('/api/templates/add', {
+          method: 'POST',
+          body: formData
+        });
+        const result = await res.json();
+        if (result.success) {
+          alert('✅ Yangi shablon muvaffaqiyatli qo\'shildi!');
+          toggleAddTemplateModal(false);
+          document.getElementById('new-template-form').reset();
+          fetchStatus();
+        } else {
+          alert('❌ Xatolik: ' + result.error);
+        }
+      } catch (err) {
+        alert('Server xatosi: ' + err);
+      }
+    }
+
+    // Har 3 sekundda avtomatik yangilash
+    fetchStatus();
+    setInterval(fetchStatus, 3000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+{
+  "shake_nati_nati": {
+    "id": "shake_nati_nati",
+    "name": "⚡ Shake by Yazaki (Nati Nati)",
+    "title": "⚡ Shake by Yazaki Nati Nati (XML)",
+    "category": "Alight Motion",
+    "description": "🔥 **Shake by Yazaki (Nati Nati)**\n\nAlight Motion dasturi uchun maxsus XML silkinish (shake) preseti.\n\n📥 **Qanday ishlatiladi:**\n1. Quyidagi «📥 Fayllarni yuklab olish» tugmasini bosing.\n2. Yuklangan `.xml` faylni Alight Motion ilovasiga import qiling!",
+    "files": [
+      "shake by yazaki nati nati.xml"
+    ],
+    "links": []
+  },
+  "wave_shake_amz": {
+    "id": "wave_shake_amz",
+    "name": "🌊 Wave Shake by (yazaki_amz)",
+    "title": "🌊 Wave Shake by (yazaki_amz) (XML)",
+    "category": "Alight Motion",
+    "description": "🌊 **Wave Shake by (yazaki_amz)**\n\nAlight Motion uchun to'lqinsimon (wave) silliq shake preseti.\n\n📥 **Qanday ishlatiladi:**\n1. Faylni yuklab oling.\n2. Loyihangizda kadrlar ustiga joylashtiring!",
+    "files": [
+      "Wave shake  by (yazaki_amz).xml"
+    ],
+    "links": []
+  },
+  "shakes_pack_amz": {
+    "id": "shakes_pack_amz",
+    "name": "💥 Shakes by [yazaki_amz)",
+    "title": "💥 Shakes by - [yazaki_amz) (XML)",
+    "category": "Alight Motion",
+    "description": "💥 **Shakes by [yazaki_amz)**\n\nAlight Motion uchun sara silkinish effektlari XML to'plami.\n\n📥 Faylni yuklab oling va Alight Motion ilovasida oching!",
+    "files": [
+      "𝗦𝗵𝗮𝗸𝗲𝘀 by - [yazaki_amz).xml"
+    ],
+    "links": []
+  },
+  "shake_yazaki_amz": {
+    "id": "shake_yazaki_amz",
+    "name": "⚡ Shake by (yazaki_amz)",
+    "title": "⚡ Shake by (yazaki_amz) (XML)",
+    "category": "Alight Motion",
+    "description": "⚡ **Shake by (yazaki_amz)**\n\nMusiqa ritmiga va basga mos tushuvchi shake effekti preseti.\n\n📥 Faylni yuklab olib, Alight Motion ilovasiga import qiling!",
+    "files": [
+      "Shake by (yazaki_amz.xml"
+    ],
+    "links": []
+  },
+  "amzp_ori_apk": {
+    "id": "amzp_ori_apk",
+    "name": "📱 Alight Motion Pro (AMZP) APK",
+    "title": "📱 Alight Motion Pro AMZP ORI APK",
+    "category": "Ilova / APK",
+    "description": "📱 **Alight Motion Pro (AMZP_ORI) APK**\n\nBarcha XML presetlarni to'liq qo'llab-quvvatlovchi, suv belgisiz (no watermark) Alight Motion Pro ilovasi.\n\n📥 Quyidagi tugma orqali ilovani yuklab oling va o'rnating!",
+    "files": [
+      "AMZP_ORI_10AUG (1).apk"
+    ],
+    "links": [
+      {
+        "text": "📢 Kanalimizdan yuklab olish",
+        "url": "https://t.me/yazaki_edits"
+      },
+      {
+        "text": "🌐 Localhost orqali yuklash",
+        "url": "http://localhost:5000/download/AMZP_ORI_10AUG%20(1).apk"
+      }
+    ]
+  }
+}
